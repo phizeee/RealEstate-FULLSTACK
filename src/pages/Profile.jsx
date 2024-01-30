@@ -31,18 +31,17 @@ export default function Profile() {
     const [userListings, setUserListings] = useState([]);
     const dispatch = useDispatch();
 
+
     useEffect(() => {
         if (file) {
             handleFileUpload(file);
         }
     }, [file]);
-
     const handleFileUpload = (file) => {
         const storage = getStorage(app);
         const fileName = new Date().getTime() + file.name;
         const storageRef = ref(storage, fileName);
         const uploadTask = uploadBytesResumable(storageRef, file);
-
         uploadTask.on(
             'state_changed',
             (snapshot) => {
@@ -60,11 +59,9 @@ export default function Profile() {
             }
         );
     };
-
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.id]: e.target.value });
     };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -87,7 +84,6 @@ export default function Profile() {
             dispatch(updateUserFailure(error.message));
         }
     };
-
     const handleDeleteUser = async () => {
         try {
             dispatch(deleteUserStart());
@@ -106,6 +102,7 @@ export default function Profile() {
     };
 
     const handleSignOut = async () => {
+
         try {
             dispatch(signOutUserStart());
             const res = await fetch('/api/auth/signout');
@@ -116,8 +113,9 @@ export default function Profile() {
             }
             dispatch(deleteUserSuccess(data));
         } catch (error) {
-            dispatch(deleteUserFailure(data.message));
+            dispatch(deleteUserFailure(error.message));
         }
+
     };
 
     const handleShowListings = async () => {
@@ -135,27 +133,6 @@ export default function Profile() {
             setShowListingsError(true);
         }
     };
-
-
-    const handleListingDelete = async (listingId) => {
-        try {
-            const res = await fetch(`/api/listing/delete/${listingId}`, {
-                method: 'DELETE',
-            });
-            const data = await res.json();
-            if (data.success === false) {
-                console.log(data.message);
-                return;
-            }
-
-            setUserListings((prev) =>
-                prev.filter((listing) => listing._id !== listingId)
-            );
-        } catch (error) {
-            console.log(error.message);
-        }
-    };
-
     return (
         <div className='p-3 max-w-lg mx-auto'>
             <h1 className='text-3xl font-semibold text-center my-7'>Profile</h1>
@@ -245,7 +222,8 @@ export default function Profile() {
                 {showListingsError ? 'Error showing listings' : ''}
             </p>
 
-            {userListings && userListings.length > 0 && (
+            {userListings &&
+                userListings.length > 0 &&
                 <div className="flex flex-col gap-4">
                     <h1 className='text-center mt-7 text-2xl font-semibold'>Your Listings</h1>
                     {userListings.map((listing) => (
@@ -273,8 +251,7 @@ export default function Profile() {
                             </div>
                         </div>
                     ))}
-                </div>
-            )}
+                </div>}
         </div>
     );
 }
